@@ -124,7 +124,8 @@ export default function App() {
     const load = () => {
       const all = window.speechSynthesis.getVoices();
       const uk = all.filter(v => v.lang.startsWith("en-GB"));
-      const list = uk.length ? uk : all.filter(v => v.lang.startsWith("en"));
+      const other = all.filter(v => v.lang.startsWith("en") && !v.lang.startsWith("en-GB"));
+      const list = [...uk, ...other];
       setVoices(list);
       if (list.length && !selectedVoice) setSelectedVoice(list[0].name);
     };
@@ -191,7 +192,20 @@ export default function App() {
           <div className="setting-row">
             <label className="setting-label">Voice</label>
             <select className="setting-select" value={selectedVoice} onChange={e => setSelectedVoice(e.target.value)}>
-              {voices.map(v => <option key={v.name} value={v.name}>{v.name}</option>)}
+              {voices.filter(v => v.lang.startsWith("en-GB")).length > 0 && (
+                <optgroup label="🇬🇧 UK English">
+                  {voices.filter(v => v.lang.startsWith("en-GB")).map(v => (
+                    <option key={v.name} value={v.name}>{v.name}</option>
+                  ))}
+                </optgroup>
+              )}
+              {voices.filter(v => !v.lang.startsWith("en-GB")).length > 0 && (
+                <optgroup label="🌐 Other English">
+                  {voices.filter(v => !v.lang.startsWith("en-GB")).map(v => (
+                    <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>
+                  ))}
+                </optgroup>
+              )}
             </select>
           </div>
 
