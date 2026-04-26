@@ -166,10 +166,9 @@ body {
   transition: transform 0.15s, box-shadow 0.15s;
   box-shadow: 0 1px 3px rgba(0,0,0,0.15);
 }
-.swatch:hover { transform: scale(1.15); }
+.swatch:hover { opacity: 0.85; }
 .swatch--on {
-  transform: scale(1.2);
-  box-shadow: 0 0 0 3px var(--bg), 0 0 0 5px var(--text);
+  border-color: var(--text) !important;
 }
 .sub-label { font-size: 0.7rem; color: var(--dim); }
 
