@@ -12,14 +12,65 @@ const PHRASES = [
 ];
 
 const THEMES = [
-  { name: "Sand",    bg: "#f0ece4", surface: "#ffffff", border: "#e2dbd0", label: "#78716c" },
-  { name: "Slate",   bg: "#e8edf2", surface: "#ffffff", border: "#d0d9e2", label: "#5a7080" },
-  { name: "Sage",    bg: "#e8ede8", surface: "#ffffff", border: "#cddacd", label: "#527052" },
-  { name: "Rose",    bg: "#f2e8e8", surface: "#ffffff", border: "#e2cece", label: "#906060" },
-  { name: "Lavender",bg: "#ede8f2", surface: "#ffffff", border: "#d8ceE2", label: "#706080" },
-  { name: "Peach",   bg: "#f2ece6", surface: "#ffffff", border: "#e2d4c8", label: "#806050" },
-  { name: "Night",   bg: "#1a1a2e", surface: "#16213e", border: "#0f3460", label: "#8892b0" },
-  { name: "Forest",  bg: "#1a2420", surface: "#1e2e28", border: "#2a4038", label: "#7aab90" },
+  { name: "Sand",     bg: "#f0ece4", surface: "#ffffff", border: "#e2dbd0", muted: "#78716c" },
+  { name: "Slate",    bg: "#e8edf2", surface: "#ffffff", border: "#d0d9e2", muted: "#5a7080" },
+  { name: "Sage",     bg: "#e8ede8", surface: "#ffffff", border: "#cddacd", muted: "#527052" },
+  { name: "Rose",     bg: "#f2e8e8", surface: "#ffffff", border: "#e2cece", muted: "#906060" },
+  { name: "Lavender", bg: "#ede8f2", surface: "#ffffff", border: "#d8cee2", muted: "#706080" },
+  { name: "Peach",    bg: "#f2ece6", surface: "#ffffff", border: "#e2d4c8", muted: "#806050" },
+  { name: "Night",    bg: "#1a1a2e", surface: "#16213e", border: "#0f3460", muted: "#8892b0" },
+  { name: "Forest",   bg: "#1a2420", surface: "#1e2e28", border: "#2a4038", muted: "#7aab90" },
+];
+
+const FONTS = [
+  {
+    name: "Classic",
+    label: "Aa",
+    description: "DM Serif + DM Sans",
+    display: "'DM Serif Display', serif",
+    body: "'DM Sans', sans-serif",
+    google: "DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600",
+  },
+  {
+    name: "Editorial",
+    label: "Aa",
+    description: "Playfair + Lato",
+    display: "'Playfair Display', serif",
+    body: "'Lato', sans-serif",
+    google: "Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@300;400;700",
+  },
+  {
+    name: "Modern",
+    label: "Aa",
+    description: "Syne + Inter",
+    display: "'Syne', sans-serif",
+    body: "'Inter', sans-serif",
+    google: "Syne:wght@600;700;800&family=Inter:wght@300;400;500;600",
+  },
+  {
+    name: "Typewriter",
+    label: "Aa",
+    description: "Courier Prime",
+    display: "'Courier Prime', monospace",
+    body: "'Courier Prime', monospace",
+    google: "Courier+Prime:ital,wght@0,400;0,700;1,400",
+  },
+  {
+    name: "Elegant",
+    label: "Aa",
+    description: "Cormorant + Jost",
+    display: "'Cormorant Garamond', serif",
+    body: "'Jost', sans-serif",
+    google: "Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600",
+  },
+  {
+    name: "Friendly",
+    label: "Aa",
+    description: "Nunito + Quicksand",
+    display: "'Nunito', sans-serif",
+    body: "'Quicksand', sans-serif",
+    google: "Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600",
+  },
 ];
 
 type State = "idle" | "speaking" | "paused";
@@ -35,22 +86,39 @@ export default function App() {
   const [wordIdx, setWordIdx] = useState(-1);
   const [showSettings, setShowSettings] = useState(false);
   const [themeIdx, setThemeIdx] = useState(0);
+  const [fontIdx, setFontIdx] = useState(0);
 
   const theme = THEMES[themeIdx];
+  const font = FONTS[fontIdx];
   const isDark = themeIdx >= 6;
 
-  // Apply theme to document
+  // Load Google Fonts dynamically
+  useEffect(() => {
+    const id = "gfont-dynamic";
+    let link = document.getElementById(id) as HTMLLinkElement | null;
+    if (!link) {
+      link = document.createElement("link");
+      link.id = id;
+      link.rel = "stylesheet";
+      document.head.appendChild(link);
+    }
+    link.href = `https://fonts.googleapis.com/css2?family=${font.google}&display=swap`;
+  }, [fontIdx]);
+
+  // Apply theme CSS vars
   useEffect(() => {
     const r = document.documentElement.style;
     r.setProperty("--bg", theme.bg);
     r.setProperty("--surface", theme.surface);
     r.setProperty("--border", theme.border);
-    r.setProperty("--muted", theme.label);
+    r.setProperty("--muted", theme.muted);
     r.setProperty("--text", isDark ? "#e2e8f0" : "#1c1917");
     r.setProperty("--dim", isDark ? "#8892b0" : "#a8a29e");
     r.setProperty("--pill-bg", isDark ? theme.surface : "#ede8df");
     r.setProperty("--pill-border", theme.border);
-  }, [themeIdx]);
+    r.setProperty("--font-display", font.display);
+    r.setProperty("--font-body", font.body);
+  }, [themeIdx, fontIdx]);
 
   useEffect(() => {
     const load = () => {
@@ -100,7 +168,6 @@ export default function App() {
 
   return (
     <div className="page">
-      {/* Header */}
       <header className="header">
         <div className="header-left">
           <span className="flag">🇬🇧</span>
@@ -110,7 +177,7 @@ export default function App() {
           </div>
         </div>
         <button className={`settings-toggle ${showSettings ? "settings-toggle--on" : ""}`}
-          onClick={() => setShowSettings(s => !s)} aria-label="Settings">
+          onClick={() => setShowSettings(s => !s)}>
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <circle cx="12" cy="12" r="3"/>
             <path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
@@ -118,33 +185,38 @@ export default function App() {
         </button>
       </header>
 
-      {/* Settings panel */}
       {showSettings && (
         <div className="settings-panel">
+          {/* Voice */}
           <div className="setting-row">
             <label className="setting-label">Voice</label>
             <select className="setting-select" value={selectedVoice} onChange={e => setSelectedVoice(e.target.value)}>
               {voices.map(v => <option key={v.name} value={v.name}>{v.name}</option>)}
             </select>
           </div>
+
+          {/* Speed */}
           <div className="setting-row">
             <label className="setting-label">Speed <span>{rate.toFixed(2)}×</span></label>
             <input type="range" min="0.5" max="1.5" step="0.05" value={rate}
               onChange={e => setRate(+e.target.value)} className="range" />
           </div>
+
+          {/* Pitch */}
           <div className="setting-row">
             <label className="setting-label">Pitch <span>{pitch.toFixed(1)}</span></label>
             <input type="range" min="0.5" max="1.5" step="0.1" value={pitch}
               onChange={e => setPitch(+e.target.value)} className="range" />
           </div>
 
-          {/* Theme picker */}
+          <div className="divider" />
+
+          {/* Background */}
           <div className="theme-row">
             <label className="setting-label">Background</label>
             <div className="theme-swatches">
               {THEMES.map((t, i) => (
-                <button
-                  key={t.name}
+                <button key={t.name}
                   className={`swatch ${i === themeIdx ? "swatch--on" : ""}`}
                   style={{ background: t.bg, borderColor: i === themeIdx ? (isDark ? "#fff" : "#1c1917") : t.border }}
                   onClick={() => setThemeIdx(i)}
@@ -153,7 +225,27 @@ export default function App() {
               ))}
             </div>
           </div>
-          <div className="theme-name">{THEMES[themeIdx].name}</div>
+          <div className="sub-label">{THEMES[themeIdx].name}</div>
+
+          <div className="divider" />
+
+          {/* Font */}
+          <div className="font-section">
+            <label className="setting-label" style={{ marginBottom: "0.6rem", display: "block" }}>Font Style</label>
+            <div className="font-grid">
+              {FONTS.map((f, i) => (
+                <button key={f.name}
+                  className={`font-card ${i === fontIdx ? "font-card--on" : ""}`}
+                  onClick={() => setFontIdx(i)}
+                  style={{ fontFamily: f.display }}
+                >
+                  <span className="font-card-sample">Aa</span>
+                  <span className="font-card-name">{f.name}</span>
+                  <span className="font-card-desc">{f.description}</span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 
@@ -170,7 +262,6 @@ export default function App() {
 
       {/* Main card */}
       <div className="card">
-        {/* When speaking: show live word highlight INSTEAD of textarea */}
         {isActive ? (
           <div className="live-display">
             {words.map((w, i) => (
@@ -227,7 +318,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Status bar */}
       {isActive && (
         <div className="status-bar">
           <span className={`status-dot ${speechState === "speaking" ? "status-dot--live" : "status-dot--paused"}`}/>
@@ -236,7 +326,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Tips */}
       <div className="tips">
         <div className="tips-title">Pronunciation tips</div>
         <div className="tips-grid">
